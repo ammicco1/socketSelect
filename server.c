@@ -101,57 +101,51 @@ int main(int argc, char **argv){
             die("select() error");
         }
         
-        for(i = 0; i < n; i){
-            if(FD_ISSET(sd_udp, &readsd)){
-                int byte_rec_udp = recvfrom(sd_udp, rec_udp, MAXLEN, 0, (struct sockaddr *) &client_ip_port_udp, &client_ip_port_length_udp);
+        if(FD_ISSET(sd_udp, &readsd)){
+            int byte_rec_udp = recvfrom(sd_udp, rec_udp, MAXLEN, 0, (struct sockaddr *) &client_ip_port_udp, &client_ip_port_length_udp);
 	        
-                if(byte_rec_udp <= 0){
-                    die("UDP socket: recvfrom() error");
-                } 
+            if(byte_rec_udp <= 0){
+                die("UDP socket: recvfrom() error");
+            } 
 	        
-                printf("UDP socket: %d byte received: %s.\n", byte_rec_udp, rec_udp);
+            printf("UDP socket: %d byte received: %s.\n", byte_rec_udp, rec_udp);
 		
-	            strcpy(send_udp, rec_udp);
+	        strcpy(send_udp, rec_udp);
 	
-	            int byte_send_udp = sendto(sd_udp, send_udp, MAXLEN, 0, (struct sockaddr *) &client_ip_port_udp, client_ip_port_length_udp);
+	        int byte_send_udp = sendto(sd_udp, send_udp, MAXLEN, 0, (struct sockaddr *) &client_ip_port_udp, client_ip_port_length_udp);
 	        
-                if(byte_send_udp <= 0){
-                    die("UDP socket: sendto() error");
-                } 
+            if(byte_send_udp <= 0){
+                die("UDP socket: sendto() error");
+            } 
 	        
-                printf("UDP socket: %d byte sent.\n", byte_send_udp);
-
-                i++;
-            }else if(FD_ISSET(sd_tcp, &readsd)){
-                tcp_conn_sd = accept(sd_tcp, (struct sockaddr *) &client_ip_port_tcp, &client_ip_port_length_tcp);
+            printf("UDP socket: %d byte sent.\n", byte_send_udp);
+        }else if(FD_ISSET(sd_tcp, &readsd)){
+            tcp_conn_sd = accept(sd_tcp, (struct sockaddr *) &client_ip_port_tcp, &client_ip_port_length_tcp);
             
-                if(tcp_conn_sd < 0){
-		            die("TCP socket: accept() error");
-		        }
+            if(tcp_conn_sd < 0){
+		        die("TCP socket: accept() error");
+		    }
 
-		        printf("TCP socket: accept() ok.\n");
+		    printf("TCP socket: accept() ok.\n");
 
-                byte_rec_tcp = read(tcp_conn_sd, rec_tcp, MAXLEN);
+            byte_rec_tcp = read(tcp_conn_sd, rec_tcp, MAXLEN);
 
-			    if(byte_rec_tcp<= 0){
-			        die("TCP socket: read() error");
-			    }
+			if(byte_rec_tcp<= 0){
+			    die("TCP socket: read() error");
+			}
 
-			    printf("TCP socket: read() ok.\nTCP socket: %d byte received: %s\n", byte_rec_tcp, rec_tcp);
+			printf("TCP socket: read() ok.\nTCP socket: %d byte received: %s\n", byte_rec_tcp, rec_tcp);
 		
-			    strcpy(send_tcp, rec_tcp);
+			strcpy(send_tcp, rec_tcp);
 
-			    /* spedisco i dati al client */
-			    byte_send_tcp = write(tcp_conn_sd, send_tcp, MAXLEN);
+			/* spedisco i dati al client */
+			byte_send_tcp = write(tcp_conn_sd, send_tcp, MAXLEN);
 
-			    if(byte_send_tcp <= 0){
-			        die("TCP socket: send() error");
-		        }
+			if(byte_send_tcp <= 0){
+			    die("TCP socket: send() error");
+		    }
 
-			    printf("TCP socket: send() ok.\n");
-
-                i++;
-            }
+			printf("TCP socket: send() ok.\n");           
         }
     }
 
